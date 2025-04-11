@@ -35,4 +35,32 @@ export class YahooFinanceController {
 
     return this.yahooFinanceService.getStockData(symbol, period1Unix, period2Unix);
   }
+
+
+  @ApiOperation({ summary: 'Get current stock price' })
+  @ApiQuery({ name: 'symbol', required: true, description: 'Stock symbol' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful retrieval of current stock price',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @Get('price')
+  async getPrice(@Query('symbol') symbol: string) {
+    const price = await this.yahooFinanceService.getCurrentPrice(symbol);
+    return { symbol, price };
+  }
+
+  @ApiOperation({ summary: 'Get news by stock symbol' })
+  @ApiQuery({ name: 'symbol', required: true, description: 'Stock symbol' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful retrieval of news by stock symbol',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @Get('news')
+  async getNewsBySymbol(@Query('symbol') symbol: string) {
+    const news = await this.yahooFinanceService.getNews(symbol);
+    return { symbol, news };
+  }
+
 }

@@ -1,11 +1,26 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import yahooFinance from 'yahoo-finance2';
 
 @Injectable()
 export class YahooFinanceService {
   constructor(private readonly httpService: HttpService) {}
+
+  async getNews(symbol: string): Promise<any> {
+    const news = await yahooFinance.search(symbol, { newsCount: 200 });
+    console.log(news.count);
+    return news.news;
+  }
+
+  async getCurrentPrice(symbol: string): Promise<number> {
+    const quote = await yahooFinance.quote(symbol);
+    if (quote.regularMarketPrice === undefined) {
+      throw new NotFoundException(`Price for symbol ${symbol} not found`);
+    }
+    return quote.regularMarketPrice;
+  }
 
   async getStockData(symbol: string, period1: number, period2: number): Promise<any> {
     const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&region=US&source=cosaic`;
