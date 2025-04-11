@@ -4,6 +4,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { YahooFinanceModule } from './yahoo-finance/yahoo-finance.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   controllers: [AppController],
@@ -18,6 +20,8 @@ import { AppController } from './app.controller';
       inject: [ConfigService],
     }),
     AuthModule,
+    YahooFinanceModule,
+    HttpModule,
   ],
 })
 export class AppModule {}
