@@ -43,4 +43,17 @@ export class YahooFinanceService {
       },
     };
   }
+  
+  async getPrices(symbols: string[]): Promise<{ [key: string]: number }> {
+    const prices = {};
+    for (const symbol of symbols) {
+      try {
+        const price = await this.getCurrentPrice(symbol);
+        prices[symbol] = price;
+      } catch (error) {
+        console.warn(`Skipping symbol ${symbol} due to error: ${error.message}`);
+      }
+    }
+    return prices;
+  }
 }

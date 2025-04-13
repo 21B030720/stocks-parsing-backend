@@ -62,5 +62,180 @@ export class YahooFinanceController {
     const news = await this.yahooFinanceService.getNews(symbol);
     return { symbol, news };
   }
+  
+  @ApiOperation({ summary: 'Get assets data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful retrieval of assets data',
+  })
+  @Get('assets')
+  async getAssets() {
+    const symbols = [
+      'KSPI',
+      'AAPL', 'MSFT', 'SBUX', 'CSCO', 'QCOM',
+      'NDX', '^GSPC',
+      // 'HSBK.IL'
+      // 'KZAP'
+      // 'KZTO'
+      // 'KZTK'
+      // 'KASE'
+    ];
+
+    const prices = await this.yahooFinanceService.getPrices(symbols);
+
+    return {
+      categories: [
+        {
+          title: 'Местные',
+          type: 'local',
+          assets: [
+            {
+              name: 'Kaspi.kz',
+              ticker: 'KSPI',
+              amount: {
+                value: prices['KSPI'],
+                currency: '₸'
+              },
+              change: '-0.61%',
+              image: 'https://logo.clearbit.com/kaspi.kz'
+            },
+            // {
+            //   name: 'Halyk Bank AO',
+            //   ticker: 'HSBK',
+            //   amount: {
+            //     value: prices['HSBK.IL'],
+            //     currency: '₸'
+            //   },
+            //   change: '+7.55%',
+            //   image: 'https://logo.clearbit.com/halykbank.kz'
+            // },
+            // {
+            //   name: 'Kazakhtelekom AO',
+            //   ticker: 'KZTK',
+            //   amount: {
+            //     value: prices['KZTK'],
+            //     currency: '₸'
+            //   },
+            //   change: '+0.43%',
+            //   image: 'https://logo.clearbit.com/telecom.kz'
+            // },
+            // {
+            //   name: 'KazTransOil AO',
+            //   ticker: 'KZTO',
+            //   amount: {
+            //     value: prices['KZTO'],
+            //     currency: '₸'
+            //   },
+            //   change: '-0.04%',
+            //   image: 'https://logo.clearbit.com/kaztransoil.kz'
+            // },
+            // {
+            //   name: 'NAK Kazatomprom AO',
+            //   ticker: 'KZAP',
+            //   amount: {
+            //     value: prices['KZAP'],
+            //     currency: '₸'
+            //   },
+            //   change: '-3.37%',
+            //   image: 'https://logo.clearbit.com/kazatomprom.kz'
+            // }
+          ]
+        },
+        {
+          title: 'Международные',
+          type: 'international',
+          assets: [
+            {
+              name: 'Apple Inc.',
+              ticker: 'AAPL',
+              amount: {
+                value: prices['AAPL'],
+                currency: '$'
+              },
+              change: '-2.66%',
+              image: 'https://logo.clearbit.com/apple.com'
+            },
+            {
+              name: 'Microsoft Corp.',
+              ticker: 'MSFT',
+              amount: {
+                value: prices['MSFT'],
+                currency: '$'
+              },
+              change: '-1.23%',
+              image: 'https://logo.clearbit.com/microsoft.com'
+            },
+            {
+              name: 'Starbucks Corp.',
+              ticker: 'SBUX',
+              amount: {
+                value: prices['SBUX'],
+                currency: '$'
+              },
+              change: '-0.74%',
+              image: 'https://logo.clearbit.com/starbucks.com'
+            },
+            {
+              name: 'Cisco Systems Inc.',
+              ticker: 'CSCO',
+              amount: {
+                value: prices['CSCO'],
+                currency: '$'
+              },
+              change: '-0.59%',
+              image: 'https://logo.clearbit.com/cisco.com'
+            },
+            {
+              name: 'QUALCOMM',
+              ticker: 'QCOM',
+              amount: {
+                value: prices['QCOM'],
+                currency: '$'
+              },
+              change: '+1.16%',
+              image: 'https://logo.clearbit.com/qualcomm.com'
+            }
+          ]
+        },
+        {
+          title: 'ETF и Индексы',
+          type: 'etf_index',
+          assets: [
+            {
+              name: 'NASDAQ 100',
+              ticker: 'NDX',
+              amount: {
+                value: prices['NDX'],
+                currency: '$'
+              },
+              change: '-0.90%',
+              image: 'https://upload.wikimedia.org/wikipedia/commons/2/20/NASDAQ_Logo.svg'
+            },
+            {
+              name: 'S&P 500',
+              ticker: 'SPX',
+              amount: {
+                value: prices['^GSPC'],
+                currency: '$',
+              },
+              change: '-0.72%',
+              image: 'https://upload.wikimedia.org/wikipedia/commons/0/0c/Standard_%26_Poor%27s_logo.svg'
+            },
+            // {
+            //   name: 'KASE Index',
+            //   ticker: 'KASE',
+            //   amount: {
+            //     value: prices['KASE'],
+            //     currency: '₸'
+            //   },
+            //   change: '+0.12%',
+            //   image: 'https://logo.clearbit.com/kase.kz'
+            // }
+          ]
+        }
+      ]
+    };
+  }
+  
 
 }
