@@ -8,6 +8,28 @@ import * as moment from 'moment';
 export class YahooFinanceController {
   constructor(private readonly yahooFinanceService: YahooFinanceService) {}
 
+  @ApiOperation({ summary: 'Convert currency' })
+  @ApiQuery({ name: 'value', required: true, description: 'Value to convert' })
+  @ApiQuery({ name: 'base', required: true, description: 'Base currency' })
+  @ApiQuery({ name: 'target', required: true, description: 'Target currency' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful conversion of currency',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request' })
+  @ApiResponse({ status: 404, description: 'Not Found' })
+  @ApiResponse({ status: 500, description: 'Internal Server Error' })
+  @Get('convert')
+  async convertCurrency(
+    @Query('value') value: number,
+    @Query('base') base: string,
+    @Query('target') target: string
+  ) {
+    const convertedValue = await this.yahooFinanceService.convertCurrency(value, base, target);
+    return { value, base, target, convertedValue };
+  }
+
+
   @ApiOperation({ summary: 'Get stock data' })
   @ApiQuery({ name: 'symbol', required: true, description: 'Stock symbol' })
   @ApiQuery({ name: 'period1', required: true, description: 'Start date (DD/MM/YYYY)' })

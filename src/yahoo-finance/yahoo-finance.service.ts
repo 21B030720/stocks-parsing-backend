@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { AxiosResponse } from 'axios';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
@@ -7,6 +7,30 @@ import yahooFinance from 'yahoo-finance2';
 @Injectable()
 export class YahooFinanceService {
   constructor(private readonly httpService: HttpService) {}
+
+  private readonly exchangeRatesApiKey = 'cur_live_EGcUMVEsMYFUAqujOWArNKDq4Yo47mFLkW0obLN1';
+
+  async convertCurrency(value: number, base: string, target: string): Promise<number> {
+    const url = `https://hexarate.paikama.co/api/rates/latest/${base}?target=${target}`;
+    try {
+      const response: AxiosResponse<any> = await firstValueFrom(this.httpService.get(url));
+      if (!response.data || !response.data.data || response.data.data.target !== target) {
+        throw new NotFoundException(`Conversion rate for ${base} to ${target} not found`);
+      }
+      const rate = response.data.data.mid;
+      return value * rate;
+    } catch (error) {
+      console.error('Error fetching conversion rate:', error.response ? error.response.data : error.message);
+      if (error.response) {
+        if (error.response.status === 400) {
+          throw new BadRequestException('Invalid request parameters');
+        } else if (error.response.status === 404) {
+          throw new NotFoundException('Conversion rate data not found');
+        }
+      }
+      throw new InternalServerErrorException('Failed to fetch conversion rate');
+    }
+  }
 
   async getNews(symbol: string): Promise<any> {
     const news = await yahooFinance.search(symbol, { newsCount: 200 });
