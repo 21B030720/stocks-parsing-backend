@@ -45,8 +45,8 @@ export class YahooFinanceController {
     @Query('period1') period1: string,
     @Query('period2') period2: string
   ) {
-    const startDate = moment(period1, 'DD/MM/YYYY');
-    const endDate = moment(period2, 'DD/MM/YYYY');
+    const startDate = moment.utc(period1, 'DD/MM/YYYY');
+    const endDate = moment.utc(period2, 'DD/MM/YYYY');
 
     if (!startDate.isValid() || !endDate.isValid()) {
       throw new BadRequestException('Invalid date format. Use DD/MM/YYYY.');

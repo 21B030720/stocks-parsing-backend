@@ -47,27 +47,43 @@ export class YahooFinanceService {
   }
 
   async getStockData(symbol: string, period1: number, period2: number): Promise<any> {
-    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=1wk&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&region=US&source=cosaic`;
+    const url = `https://query2.finance.yahoo.com/v8/finance/chart/${symbol}?period1=${period1}&period2=${period2}&interval=1d&includePrePost=true&events=div%7Csplit%7Cearn&lang=en-US&region=US&source=cosaic`;
 
-    const response: AxiosResponse<any> = await firstValueFrom(this.httpService.get(url));
-    const result = response.data.chart.result[0].indicators.quote[0];
+    try {
+      const response: AxiosResponse<any> = await firstValueFrom(this.httpService.get(url));
+      const result = response.data.chart.result[0];
+      const quote = result.indicators.quote[0];
+      const timestamps = result.timestamp;
 
-    return {
-      close: result.close,
-      high: result.high,
-      low: result.low,
-      open: result.open,
-      volume: result.volume,
-      amount: {
-        close: result.close.length,
-        high: result.high.length,
-        low: result.low.length,
-        open: result.open.length,
-        volume: result.volume.length,
-      },
-    };
+      // // Log the timestamps for debugging
+      // console.log('Requested period:', new Date(period1 * 1000).toISOString(), 'to', new Date(period2 * 1000).toISOString());
+      // console.log('Returned timestamps:', timestamps.map(ts => new Date(ts * 1000).toISOString()));
+
+      const stockData = timestamps.map((timestamp, index) => ({
+        date: new Date(timestamp * 1000).toISOString(),
+        close: quote.close[index],
+        high: quote.high[index],
+        low: quote.low[index],
+        open: quote.open[index],
+        volume: quote.volume[index],
+      }));
+
+      return {
+        stockData,
+        amount: {
+          close: quote.close.length,
+          high: quote.high.length,
+          low: quote.low.length,
+          open: quote.open.length,
+          volume: quote.volume.length,
+        },
+      };
+    } catch (error) {
+      console.error('Error fetching stock data:', error.response ? error.response.data : error.message);
+      throw new InternalServerErrorException('Failed to fetch stock data');
+    }
   }
-  
+
   async getPrices(symbols: string[]): Promise<{ [key: string]: number }> {
     const prices = {};
     for (const symbol of symbols) {
